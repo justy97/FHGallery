@@ -1,44 +1,77 @@
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
-
-var campgrounds = [
-	{name:"Salmon",image:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"},
-	{name:"Hill",image:"https://images.unsplash.com/photo-1532339142463-fd0a8979791a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"},
-	{name:"Woods",image:"https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"},
-	{name:"Salmon",image:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"},
-	{name:"Hill",image:"https://images.unsplash.com/photo-1532339142463-fd0a8979791a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"},
-	{name:"Woods",image:"https://images.unsplash.com/photo-1571863533956-01c88e79957e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"}
-]
+const express = require("express"),
+	app = express(),
+	bodyParser = require("body-parser"),
+	mongoose = require("mongoose");
+	Campground = require("./models/campground");
+	Comment = require("./models/comment");
+	seedDB = require("./seeds");
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.set("view engine", "ejs");
+app.use(express.static("public"));
+seedDB();
+
+mongoose.connect('mongodb://localhost:27017/yelp_camp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to DB!'))
+.catch(error => console.log(error.message));
 
 app.get("/",function(req,res){
 	res.render("landing");
 })
 
-// RESTful convention #1
+// RESTful INDEX route - show all campgrounds
 app.get("/campgrounds",function(req,res){
-	res.render("campgrounds",{campgrounds:campgrounds});
-})
+	//Get all campgrounds from DB
+	Campground.find({},function(err,allcampgrounds){
+		if(err){
+			console.log(err);
+		}else{
+			res.render("index",{campgrounds:allcampgrounds})
+		}
+	});
+});
 
-// RESTful convention #2
+// RESTful NEW route - show form to create new campground
 app.get("/campgrounds/new",function(req,res){
-	res.render("new.ejs");
+	res.render("new");
 })
 
-// RESTful convention #3
+// RESTful CREATE route - add new campground to DB
 app.post("/campgrounds",function(req,res){
 // 	get data from form and add to campgrounds array
 	var name = req.body.name;
 	var image = req.body.image;
-	var newCamp = {name:name, image:image};
-	campgrounds.push(newCamp);
-// 	redirect back to campground page
-	res.redirect("/campgrounds");
+	var desc = req.body.description;
+	var newCamp = {name:name, image:image, description:desc};
+	//save to DB
+	Campground.create(newCamp,function(err,newlyCreated){
+		if(err){
+			console.log(err);
+		} else{
+			// 	redirect back to campground page
+			res.redirect("/campgrounds");
+		}
+	});
+});
+
+//RESTful SHOW route - show additional info of 1 item
+app.get("/campgrounds/:id", function(req,res){
+	//find the campground with provided ID
+	Campground.findById(req.params.id).populate("comments").exec(function(err,foundCampground){
+		if(err){
+			console.log(err);
+		} else{
+			//render show template with selected campground
+			res.render("show",{campground:foundCampground});
+		}
+	});
+	
 })
 
 app.listen(3000,function(){
 	console.log('The YelpCamp Server started on port 3000');
-})
+});
+

@@ -8,7 +8,7 @@ const express = require("express"),
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.use(express.static(__dirname+"/public"));
 seedDB();
 
 mongoose.connect('mongodb://localhost:27017/yelp_camp', {
@@ -29,14 +29,14 @@ app.get("/campgrounds",function(req,res){
 		if(err){
 			console.log(err);
 		}else{
-			res.render("index",{campgrounds:allcampgrounds})
+			res.render("campgrounds/index",{campgrounds:allcampgrounds})
 		}
 	});
 });
 
 // RESTful NEW route - show form to create new campground
 app.get("/campgrounds/new",function(req,res){
-	res.render("new");
+	res.render("campgrounds/new");
 })
 
 // RESTful CREATE route - add new campground to DB
@@ -65,11 +65,46 @@ app.get("/campgrounds/:id", function(req,res){
 			console.log(err);
 		} else{
 			//render show template with selected campground
-			res.render("show",{campground:foundCampground});
+			res.render("campgrounds/show",{campground:foundCampground});
 		}
 	});
 	
+});
+
+// ==================================================  ==================================================
+//COMMENTS ROUTES
+// ==================================================  ==================================================
+app.get("/campgrounds/:id/comments/new", function(req,res){
+	Campground.findById(req.params.id,function(err,campground){
+		if(err){
+			console.log(err);
+			res.redirect("/campgrounds")
+		} else{
+			//render comments/new
+			res.render("comments/new",{campground:campground});
+		}
+	});
+});
+
+app.post("/campgrounds/:id/comments",function(req,res){
+	Campground.findById(req.params.id,function(err,campground){
+		if(err){
+			console.log(err);
+			res.redirect("/campgrounds")
+		} else{
+			//render comments/new
+				Comment.create(req.body.comment,function(err,comment){
+				if(err){console.log(err)}
+				else{
+					campground.comments.push(comment)
+					campground.save()
+					res.redirect("/campgrounds/"+campground._id)
+				}
+			})
+		}
+	});
 })
+
 
 app.listen(3000,function(){
 	console.log('The YelpCamp Server started on port 3000');

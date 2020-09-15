@@ -4,6 +4,7 @@ var express = require("express"),
 	mongoose = require("mongoose"),
 	passport = require("passport"),
 	LocalStrategy = require("passport-local"),
+	methodOverride = require("method-override"),
 	Campground = require("./models/campground"),
 	Comment = require("./models/comment"),
 	User = require("./models/user"),
@@ -24,7 +25,10 @@ mongoose.connect('mongodb://localhost:27017/yelp_camp', {
 app.use(bodyParser.urlencoded({extended:true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname+"/public"));
-seedDB();
+app.use(methodOverride("_method"));
+mongoose.set('useFindAndModify',false);//gets rid of Deprecation Warning
+
+//seedDB();//seed the Database
 
 //PASSPORT CONFIG
 app.use(require("express-session")({
@@ -38,7 +42,7 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use(function(req,res,next){
+app.use(function(req,res,next){//pass in currentUser variable to all routes.
 	res.locals.currentUser = req.user;
 	next();
 })

@@ -1,3 +1,5 @@
+require('dotenv').config();//config dotenv
+
 var express = require("express"),
 	app = express(),
 	bodyParser = require("body-parser"),
@@ -16,7 +18,7 @@ var commentRoutes = require("./routes/comments"),
 	campgroundRoutes = require("./routes/campgrounds"),
 	indexRoutes = require("./routes/index")
 
-mongoose.connect('mongodb://localhost:27017/yelp_camp', {
+mongoose.connect('mongodb://127.0.0.1:27017/yelp_camp', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -55,6 +57,6 @@ app.use("/",indexRoutes);
 app.use("/campgrounds/:id/comments",commentRoutes);
 app.use("/campgrounds",campgroundRoutes);
 
-app.listen(3000,function(){
-	console.log('The YelpCamp Server started on port 3000');
+app.listen(8080,function(){
+	console.log('The YelpCamp Server started on port 8080');
 });

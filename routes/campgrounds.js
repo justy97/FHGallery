@@ -3,6 +3,28 @@ const router = express.Router();
 const Campground = require("../models/campground");
 const middleware = require("../middleware");//if we require a directory w/o file, it requires index file
 
+const multer = require('multer');//multer config
+const storage = multer.diskStorage({
+	filename: function(req, file, callback) {
+		callback(null, Date.now() + file.originalname);
+	}
+});
+const imageFilter = function (req, file, cb) {
+	// accept image files only
+	if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+		return cb(new Error('Only image files are allowed!'), false);
+	}
+	cb(null, true);
+};
+const upload = multer({ storage: storage, fileFilter: imageFilter})
+
+const cloudinary = require('cloudinary');//cloudinary config
+cloudinary.config({ 
+	cloud_name: 'tiandi', 
+	api_key: process.env.CLOUDINARY_API_KEY, 
+	api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 // INDEX route - show all campgrounds
 router.get("/",function(req,res){
 	//Get all campgrounds from DB
@@ -21,25 +43,23 @@ router.get("/new", middleware.isLoggedIn, function(req,res){
 })
 
 // CREATE route - add new campground to DB
-router.post("/", middleware.isLoggedIn, function(req,res){
-// 	get data from form and add to campgrounds array
-	var name = req.body.name;
-	var image = req.body.image;
-	var desc = req.body.description;
-	var author ={
-		id:req.user._id,
-		username:req.user.username
-	}
-	var newCamp = {name:name, image:image, description:desc, author:author};
-	//save to DB
-	Campground.create(newCamp,function(err,newlyCreated){
-		if(err){
-			console.log(err);
-		} else{
-			// 	redirect back to campground page
-			res.redirect("/campgrounds");
+router.post("/", middleware.isLoggedIn, upload.single('image'), function(req, res) {
+	cloudinary.uploader.upload(req.file.path, function(result) {
+		// add cloudinary url for the image to the campground object under image property
+		req.body.campground.image = result.secure_url;
+		// add author to campground
+		req.body.campground.author = {
+			id: req.user._id,
+			username: req.user.username
 		}
-	});
+		Campground.create(req.body.campground, function(err, campground) {
+		if (err) {
+			req.flash('error', err.message);
+			return res.redirect('back');
+		}
+		res.redirect('/campgrounds/' + campground.id);
+		});
+	});  
 });
 
 // SHOW route - show additional info of 1 item

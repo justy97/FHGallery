@@ -1,1 +1,4 @@
-Yelp-like Web Project
+# Yelp-like Web Project
+
+# TODOS
+    - Change Strucuture to hide private files

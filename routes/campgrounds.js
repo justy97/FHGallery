@@ -25,7 +25,7 @@ cloudinary.config({
 	api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// INDEX route - show all campgrounds
+// INDEX route - show all posts
 router.get("/",function(req,res){
 	//Get all campgrounds from DB
 	Campground.find({},function(err,allcampgrounds){
@@ -37,16 +37,22 @@ router.get("/",function(req,res){
 	});
 });
 
-// NEW route - show form to create new campground
+// NEW route - show form to create new post
 router.get("/new", middleware.isLoggedIn, function(req,res){
 	res.render("campgrounds/new");
 })
 
-// CREATE route - add new campground to DB
+// CREATE route - add new post to DB
 router.post("/", middleware.isLoggedIn, upload.single('image'), function(req, res) {
-	cloudinary.uploader.upload(req.file.path, function(result) {
+	cloudinary.v2.uploader.upload(req.file.path, function(err,result) {
+		if(err){
+			req.flash('err',err.message);
+			return res.redirect('back');
+		}
 		// add cloudinary url for the image to the campground object under image property
 		req.body.campground.image = result.secure_url;
+		// add image's public_id to campground object
+		req.body.campground.imageId = result.public_id;
 		// add author to campground
 		req.body.campground.author = {
 			id: req.user._id,
@@ -77,20 +83,46 @@ router.get("/:id", function(req,res){
 	
 });
 
-//EDIT CAMPGROUND route
+//EDIT POST route
 router.get("/:id/edit", middleware.checkCampgroundOwnership, function(req,res){
 	Campground.findById(req.params.id,function(err,foundCampground){
-		res.render("campgrounds/edit",{campground:foundCampground});
+		if(err || !foundCampground){
+			req.flash("error","Campground not found");
+			res.redirect("back");
+		} else{
+			//render EDIT template with selected campground
+			res.render("campgrounds/edit",{campground:foundCampground});
+		}
 	})
 })
 
-//UPDATE CAMPGROUND route
-router.put("/:id", middleware.checkCampgroundOwnership,function(req,res){
-	//find and update
-	Campground.findByIdAndUpdate(req.params.id,req.body.camp,function(err,updatedCampground){
-		if(err){res.redirect("/campgrounds");}
+//UPDATE POST route
+router.put("/:id", upload.single('image'), middleware.checkCampgroundOwnership, function(req,res){
+	//find by Id
+	Campground.findById(req.params.id, async function(err,updatedCampground){
+		if(err){
+			req.flash("error",err.message);
+			res.redirect("back");
+		}
 		else{
-			//redirect to show page
+			if(req.file){
+				try{
+					await cloudinary.v2.uploader.destroy(updatedCampground.imageId);
+					let result = await cloudinary.v2.uploader.upload(req.file.path);
+					updatedCampground.imageId = result.public_id;
+					updatedCampground.image = result.secure_url;
+				} catch(err){
+					req.flash("error",err.message);
+					return res.redirect("back");
+				}
+			}
+			// update name and description
+			updatedCampground.name = req.body.name;
+			updatedCampground.description = req.body.description;
+			updatedCampground.save();
+			
+			//redirect to show page and flash message if successful
+			req.flash("success","Successfully Update!");
 			res.redirect("/campgrounds/" + req.params.id);
 		}
 	})
@@ -100,11 +132,13 @@ router.put("/:id", middleware.checkCampgroundOwnership,function(req,res){
 router.delete("/:id", middleware.checkCampgroundOwnership,async(req,res)=>{
 	try{
 		let foundCampground = await Campground.findById(req.params.id);
+		await cloudinary.v2.uploader.destroy(foundCampground.imageId);
 		await foundCampground.remove();
+		req.flash('success','Post deleted successfully');
 		res.redirect("/campgrounds");
 	}  
-	catch(error){
-		console.log(err);
+	catch(err){
+		req.flash("error",err.message);
 		res.redirect("/campgrounds");
 	}
 });

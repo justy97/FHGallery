@@ -10,7 +10,8 @@ body{
 }
 
 #landing-header h1 {
-  color: red;
+  color: antiquewhite;
+  font-weight: bold;
 }
 
 .slideshow { 

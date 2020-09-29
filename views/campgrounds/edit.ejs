@@ -5,29 +5,30 @@
 		<h1 style="text-align:center;">
 			Edit <strong><%= campground.name %></strong>
 		</h1>
-		<div style="width:30%; margin:25px auto;">
+		<div class="post-form">
 			<form action ="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
 				<div class="form-group">
 					<!--edit name-->
-					<input class="form-control" type="text" name="name" value="<%= campground.name %>">
+					<input class="form-control title-text" type="text" name="name" value="<%= campground.name %>" placeholder="name (<30 characters)" maxlength="30" required>
 				</div>
 				
 				<div class="form-group">
 					<!--edit image-->
-                    <label for="image">Image</label>
-                    <input type="file" id="image" name="image" accept="image/*">
+                    <label for="image">You can change image:</label>
+                    <input type="file" id="image" name="image" accept="image/*" onchange="previewFile(this);">
+                    <img id="previewImg" src="<%= campground.image %>" alt="your image" class="image-preview">
                 </div>
 				
 				<div class="form-group">
 					<!--edit description-->
-					<input class="form-control" type="text" name="description" value="<%= campground.description %>">
+					<textarea class="form-control" type="text" name="description" placeholder="Add some description! (<500 characters)" rows="5" cols="50" maxlength="500"><%= campground.description %></textarea>
 				</div>
 				
 				<div class="form-group">
 					<button class="btn btn-lg btn-default btn-block btn-primary">Submit!</button>
 				</div>
 			</form>
-			<a href="/campgrounds">Back</a>
+			<a href="/campgrounds" class="back-button">Back</a>
 		</div>
 	</div>	
 </div>

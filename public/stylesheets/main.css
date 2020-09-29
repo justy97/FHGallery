@@ -1,3 +1,21 @@
+@font-face{
+	src:url("/fonts/KelsonSans-Normal.otf");
+	font-family:kel;
+	font-weight: normal;
+}
+
+@font-face{
+	src:url("/fonts/KelsonSans-Bold.otf");
+	font-family:kel;
+	font-weight:bold;
+}
+
+@font-face{
+	src:url("/fonts/KelsonSans-Light.otf");
+	font-family:kel;
+	font-weight: lighter;
+}
+
 label{
 	font-weight: bold;
 	font-size:1.5em;
@@ -36,6 +54,7 @@ label{
 body{
 	background-color:dimgrey;
 	color:white;
+	font-family: kel;
 }
 
 .jumbotron{
@@ -61,8 +80,9 @@ body{
 }
 
 .back-button{
-	color:darkblue;
-	font-size: 1.4em;
+	color:#66b3ff;
+	font-size: 1.3em;
+	text-shadow: 1px 1px blue;
 }
 
 .well{

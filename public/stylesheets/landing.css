@@ -1,5 +1,18 @@
 body{
 	background-color:#000;
+  font-family: kel;
+}
+
+@font-face{
+	src:url("/fonts/KelsonSans-Bold.otf");
+	font-family:kel;
+	font-weight:bold;
+}
+
+@font-face{
+	src:url("/fonts/KelsonSans-Normal.otf");
+	font-family:kel;
+	font-weight: normal;
 }
 
 #landing-header {
@@ -12,6 +25,12 @@ body{
 #landing-header h1 {
   color: antiquewhite;
   font-weight: bold;
+}
+
+.title-logo{
+  color:#cc7a00;
+  font-size:1.5em;
+  text-shadow:1px 1px white;
 }
 
 .slideshow { 
@@ -44,19 +63,20 @@ body{
   background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601088823/Y4S3_liiusw.jpg) 
 }
 .slideshow li:nth-child(2) { 
-  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601089176/Y1Title2_j0om1a.jpg);
+  
+  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601088811/Y4S2_imte3e.jpg);
   animation-delay: 10s; 
 }
 .slideshow li:nth-child(3) { 
-  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601088811/Y4S2_imte3e.jpg);
+  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601088819/Y4_twiazr.jpg);
   animation-delay: 20s; 
 }
 .slideshow li:nth-child(4) { 
-  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601088819/Y4_twiazr.jpg);
+  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601089177/Y1Title1_k74nt6.jpg);
   animation-delay: 30s; 
 }
 .slideshow li:nth-child(5) { 
-  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601089177/Y1Title1_k74nt6.jpg);
+  background-image: url(https://res.cloudinary.com/tiandi/image/upload/v1601089176/Y1Title2_j0om1a.jpg);
   animation-delay: 40s; 
 }
 

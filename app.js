@@ -19,7 +19,7 @@ var commentRoutes = require("./routes/comments"),
 	campgroundRoutes = require("./routes/campgrounds"),
 	indexRoutes = require("./routes/index")
 
-mongoose.connect('mongodb+srv://justy97:WDSRS19970507@cluster0.jhdpp.mongodb.net/FHFashion?retryWrites=true&w=majority', {
+mongoose.connect(process.env.DATABASEURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

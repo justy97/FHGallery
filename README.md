@@ -1,4 +1,4 @@
-# Yelp-like Web Project
+# FHFashion: a Yelp-like Gallery Website
 A gallery website aimed for users to post their *For Honor* character customization<br/>
 
 ## Demo
@@ -11,6 +11,8 @@ The current version: <https://fhfashion.herokuapp.com/>
     * User login with their username and password
 * Authorization
 * Manage Posts and Comments
+    * Signed in users can **post** or **edit** their photos or comments as they like.
+    * Users are **only** allowed to edit and delete their **own** photos or comments.
 * Manage User accounts
 * Flash messages for user notifications
 
@@ -26,9 +28,11 @@ The current version: <https://fhfashion.herokuapp.com/>
 ### Front-end
 * ejs
 * Boostrap 3
+* jQuery
 
 ### Back-end
-* express
+* Node.js
+* Express
 * mongoDB
 * passport.js
 * express-session
@@ -41,7 +45,6 @@ The current version: <https://fhfashion.herokuapp.com/>
 * [Cloud9](https://aws.amazon.com/cloud9/?origin=c9io)
 
 ## TODOS
-    - Load Landing photos from local to improve load time.
     - Add post and comment time checking
     - Prevent multiple clicking submit
     - Make user profile page
@@ -54,4 +57,5 @@ The current version: <https://fhfashion.herokuapp.com/>
     - Better safety: (Helmet?)
     - Search by name or category
     - Sort by most viewed, most/least recent
+    - Add Administrator
     - Add rating? 
